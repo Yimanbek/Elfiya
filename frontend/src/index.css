@@ -1,0 +1,59 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Poppins:wght@400;500;600&display=swap');
+
+:root {
+  --elf-primary: #8B5CF6; 
+  --elf-primary-hover: #7C3AED;
+  --elf-accent: #F472B6; 
+  --elf-bg: #FAFAFA; 
+  --elf-text: #1F2937;
+  --elf-text-light: #6B7280;
+}
+
+body {
+  font-family: 'Poppins', sans-serif;
+  background-color: var(--elf-bg);
+  color: var(--elf-text);
+  margin: 0;
+  padding: 0;
+}
+
+h1, h2, h3, h4, h5, h6, .brand-font {
+  font-family: 'Playfair Display', serif;
+  font-weight: 700;
+}
+
+.text-primary-elf { color: var(--elf-primary) !important; }
+.text-accent-elf { color: var(--elf-accent) !important; }
+.bg-primary-elf { background-color: var(--elf-primary) !important; }
+.btn-elf {
+  background-color: var(--elf-primary);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-weight: 500;
+  transition: all 0.3s;
+}
+.btn-elf:hover {
+  background-color: var(--elf-primary-hover);
+  color: white;
+  transform: translateY(-2px);
+}
+
+.nav-hover-elf {
+  transition: all 0.2s ease-in-out;
+}
+.nav-hover-elf:hover {
+  color: var(--elf-primary) !important;
+  transform: translateY(-2px);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0.6; }
+  to { opacity: 0.9; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(10px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
