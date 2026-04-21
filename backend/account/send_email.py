@@ -2,8 +2,9 @@ from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 from django.conf import settings
+from decouple import config
 
-FRONTEND_URL = "http://localhost:5173"
+FRONTEND_URL = config('FRONTEND_URL')
 
 def send_custom_email(email, token, mode='activation'):
     if mode == 'activation':

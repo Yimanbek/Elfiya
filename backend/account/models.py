@@ -22,6 +22,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(unique=True, verbose_name='Email')
     phone_number = models.CharField(max_length=15, blank=True, null=True, verbose_name='Номер телефона')
     full_name = models.CharField(max_length=50, verbose_name='ФИО')
+    avatar = models.ImageField(upload_to='avatars/', blank=True, null = True)
     
     is_active = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)

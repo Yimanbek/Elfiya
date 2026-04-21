@@ -9,6 +9,7 @@ from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser
 from .models import BonusWallet, BonusSetting
 from .send_email import send_activation_email, send_reset_password_email
 from rest_framework.decorators import api_view, permission_classes
+from rest_framework.parsers import MultiPartParser, FormParser
 
 User = get_user_model()
 
@@ -117,7 +118,8 @@ class CurrentUserProfileView(APIView):
             "full_name": user.full_name,
             "phone_number": user.phone_number,
             "wallet_balance": balance, 
-            "is_staff": user.is_staff
+            "is_staff": user.is_staff,
+            "avatar": user.avatar.url if user.avatar else None
         })
     
 @api_view(['GET'])
@@ -144,14 +146,30 @@ class WalletView(APIView):
             return Response({"error":"Кашелек не найден"}, status=404)
     
         self.check_object_permissions(request, wallet)
-        return Response({"amount": wallet.amount, "username": wallet.user.full_name})
+        return Response({"balance": wallet.balance, "username": wallet.user.full_name})
     
 
 
+class ProfileEditRawView(APIView):
+    permission_classes = [IsAuthenticated]
+    parser_classes = [MultiPartParser, FormParser] 
 
-
-
-
-
+    def patch(self, request):
+        user = request.user
+        
+        user.full_name = request.data.get('full_name', user.full_name)
+        user.phone_number = request.data.get('phone_number', user.phone_number)
+        
+        if 'avatar' in request.FILES:
+            user.avatar = request.FILES['avatar']
+            
+        user.save()
+        
+        return Response({
+            "message": "Профиль обновлен",
+            "full_name": user.full_name,
+            "phone_number": user.phone_number,
+            "avatar": user.avatar.url if user.avatar else None 
+        })
 
 

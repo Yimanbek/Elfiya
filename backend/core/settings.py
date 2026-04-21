@@ -46,7 +46,8 @@ INSTALLED_APPS = [
     'account',
     'menu',
     'order',
-    'reports'
+    'reports',
+    'anymail'
 ]
 
 MIDDLEWARE = [
@@ -134,9 +135,25 @@ STATIC_URL = 'static/'
 
 AUTH_USER_MODEL = 'account.User'
 
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+CORS_ALLOW_CREDENTIALS = True
+
 CORS_ALLOWED_ORIGINS = [
+    "https://elfiya.pp.ua",
+    "https://www.elfiya.pp.ua",
+    "http://localhost:5173",
+    "http://127.0.0.1:5173", 
+    "http://localhost:3000", 
+    "http://127.0.0.1:3000",
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://elfiya.pp.ua",
+    "https://www.elfiya.pp.ua",
     "http://localhost:5173",
     "http://127.0.0.1:5173",
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
 ]
 
 REST_FRAMEWORK = {
@@ -150,13 +167,10 @@ REST_FRAMEWORK = {
 }
 
 
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
+ANYMAIL = {
+    "RESEND_API_KEY": config("RESEND_API_KEY"),
+}
 
+EMAIL_BACKEND = "anymail.backends.resend.EmailBackend"
 
-EMAIL_HOST_USER = config('EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
-
-DEFAULT_FROM_EMAIL = f'Elfiya Support <{EMAIL_HOST_USER}>'
+DEFAULT_FROM_EMAIL = 'hello@elfiya.pp.ua'
