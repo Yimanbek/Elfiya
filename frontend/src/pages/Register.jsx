@@ -41,7 +41,7 @@ export default function Register() {
           <h1 className="display-1 mb-3">💌</h1>
           <h3 className="brand-font text-primary-elf fw-bold">Остался один шаг!</h3>
           <p className="text-muted mt-2">
-            Мы отправили магическую ссылку на <b>{formData.email}</b>.<br/>Перейди по ней, чтобы активировать аккаунт.
+            Мы отправили магическую ссылку на <b>{formData.email}</b>.<br/>Перейди по ней, чтобы активировать аккаунт. <br/>Проверьте спам!
           </p>
           <Link to="/login" className="btn btn-outline-elf rounded-pill px-5 mt-4">Вернуться ко входу</Link>
         </div>

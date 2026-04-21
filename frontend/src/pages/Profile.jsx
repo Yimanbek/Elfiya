@@ -6,40 +6,52 @@ export default function Profile() {
   const navigate = useNavigate();
   const [profileData, setProfileData] = useState(null);
   const [orders, setOrders] = useState([]);
-  const [bonusHistory, setBonusHistory] = useState([]); // Стейт для истории бонусов
+  const [bonusHistory, setBonusHistory] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  
+  const MEDIA_BASE = import.meta.env.VITE_BASE_URL;
   const [expandedOrderId, setExpandedOrderId] = useState(null);
 
-  useEffect(() => {
-    const fetchProfileData = async () => {
-      try {
-        // Добавили третий запрос на историю транзакций
-        const [profileResponse, ordersResponse, bonusResponse] = await Promise.all([
-          api.get('profile/'), // Убедись, что тут правильный путь твоего бэка
-          api.get('orders/'),
-          api.get('bonus-transactions/') // Наш новый эндпоинт
-        ]);
-        const sortedOrders = ordersResponse.data
-          .sort((a,b) => new Date(b.created_at) - new Date(a.created_at))
-          .slice(0, 16);
-        setOrders(sortedOrders);
-        setProfileData(profileResponse.data);
-        setBonusHistory(bonusResponse.data);
-        setLoading(false);
-      } catch (err) {
-        if (err.response?.status === 401) {
-          handleLogout(); 
-        } else {
-          setError('Не удалось загрузить данные кабинета. Проверь эндпоинты бэкенда.');
-        }
-        setLoading(false);
-      }
-    };
+  // --- Стейты для редактирования профиля ---
+  const [isEditing, setIsEditing] = useState(false);
+  const [editForm, setEditForm] = useState({ full_name: '', phone_number: '' });
+  const [avatarFile, setAvatarFile] = useState(null);
+  const [isSaving, setIsSaving] = useState(false);
 
+  useEffect(() => {
     fetchProfileData();
   }, []);
+
+  const fetchProfileData = async () => {
+    try {
+      const [profileResponse, ordersResponse, bonusResponse] = await Promise.all([
+        api.get('profile/'), // Загрузка данных
+        api.get('orders/'),
+        api.get('bonus-transactions/')
+      ]);
+      const sortedOrders = ordersResponse.data
+        .sort((a,b) => new Date(b.created_at) - new Date(a.created_at))
+        .slice(0, 16);
+      setOrders(sortedOrders);
+      setProfileData(profileResponse.data);
+      setBonusHistory(bonusResponse.data);
+      
+      // Предзаполняем форму редактирования
+      setEditForm({
+        full_name: profileResponse.data.full_name || '',
+        phone_number: profileResponse.data.phone_number || ''
+      });
+      
+      setLoading(false);
+    } catch (err) {
+      if (err.response?.status === 401) {
+        handleLogout(); 
+      } else {
+        setError('Не удалось загрузить данные кабинета. Проверь эндпоинты бэкенда.');
+      }
+      setLoading(false);
+    }
+  };
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -58,6 +70,51 @@ export default function Profile() {
   const calculateTotal = (items) => {
     return items.reduce((sum, item) => sum + (parseFloat(item.price) * item.quantity), 0);
   };
+
+  // --- Хэндлер сохранения профиля ---
+  const handleSaveProfile = async (e) => {
+    e.preventDefault();
+    setIsSaving(true);
+
+    const formData = new FormData();
+    formData.append('full_name', editForm.full_name);
+    formData.append('phone_number', editForm.phone_number);
+    
+    // Если выбрали новую фотку - добавляем её
+    if (avatarFile) {
+      formData.append('avatar', avatarFile);
+    }
+
+    try {
+      // Отправляем на наш новый эндпоинт
+      const response = await api.patch('profile-edit/', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      
+      // Обновляем данные на фронте без перезагрузки страницы
+      setProfileData({
+        ...profileData,
+        full_name: response.data.full_name,
+        phone_number: response.data.phone_number,
+        avatar: response.data.avatar
+      });
+      
+      setIsEditing(false); // Выходим из режима редактирования
+      alert('Профиль успешно обновлен! 🚀');
+    } catch (err) {
+      console.error(err);
+      alert('Ошибка при сохранении профиля.');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  // Формируем URL аватарки (с проверкой на http)
+  const avatarUrl = profileData?.avatar 
+    ? (profileData.avatar.startsWith('http') ? profileData.avatar : `${MEDIA_BASE}${profileData.avatar}`) 
+    : null;
 
   if (loading) return (
     <div className="text-center mt-5">
@@ -79,19 +136,83 @@ export default function Profile() {
           {/* КАРТОЧКА ПОЛЬЗОВАТЕЛЯ */}
           <div className="card border-0 shadow-sm mb-4" style={{ borderRadius: '15px' }}>
             <div className="card-body text-center p-4">
-              <div className="bg-light rounded-circle d-inline-flex justify-content-center align-items-center mb-3" style={{ width: '80px', height: '80px' }}>
-                <span className="fs-1">👤</span>
-              </div>
-              <h4 className="fw-bold mb-1">{profileData?.full_name || 'Без имени'}</h4>
-              <p className="text-muted mb-4">{profileData?.phone_number || 'Нет номера'}</p>
               
-              <button onClick={handleLogout} className="btn btn-outline-danger w-100 rounded-pill fw-medium mb-2">
-                Выйти из аккаунта
-              </button>
-              
-              <Link to="/support" className="btn btn-light border w-100 rounded-pill fw-medium shadow-sm">
-                💬 Служба поддержки
-              </Link>
+              {isEditing ? (
+                // --- РЕЖИМ РЕДАКТИРОВАНИЯ ---
+                <form onSubmit={handleSaveProfile}>
+                  <h5 className="fw-bold mb-3">Редактирование</h5>
+                  
+                  <div className="mb-2 text-start">
+                    <label className="small text-muted mb-1">Аватарка</label>
+                    <input 
+                      type="file" 
+                      className="form-control form-control-sm"
+                      accept="image/*"
+                      onChange={(e) => setAvatarFile(e.target.files[0])}
+                    />
+                  </div>
+                  
+                  <div className="mb-2 text-start">
+                    <label className="small text-muted mb-1">ФИО</label>
+                    <input 
+                      type="text" 
+                      className="form-control form-control-sm"
+                      value={editForm.full_name}
+                      onChange={(e) => setEditForm({...editForm, full_name: e.target.value})}
+                      required
+                    />
+                  </div>
+
+                  <div className="mb-3 text-start">
+                    <label className="small text-muted mb-1">Телефон</label>
+                    <input 
+                      type="text" 
+                      className="form-control form-control-sm"
+                      value={editForm.phone_number}
+                      onChange={(e) => setEditForm({...editForm, phone_number: e.target.value})}
+                    />
+                  </div>
+
+                  <button type="submit" disabled={isSaving} className="btn btn-success w-100 rounded-pill fw-medium mb-2">
+                    {isSaving ? 'Сохранение...' : 'Сохранить'}
+                  </button>
+                  <button type="button" onClick={() => setIsEditing(false)} className="btn btn-outline-secondary w-100 rounded-pill fw-medium">
+                    Отмена
+                  </button>
+                </form>
+
+              ) : (
+                // --- РЕЖИМ ПРОСМОТРА ---
+                <>
+                  {avatarUrl ? (
+                    <img 
+                      src={avatarUrl} 
+                      alt="Аватар" 
+                      className="rounded-circle mb-3 shadow-sm" 
+                      style={{ width: '80px', height: '80px', objectFit: 'cover' }} 
+                    />
+                  ) : (
+                    <div className="bg-light rounded-circle d-inline-flex justify-content-center align-items-center mb-3" style={{ width: '80px', height: '80px' }}>
+                      <span className="fs-1">👤</span>
+                    </div>
+                  )}
+                  
+                  <h4 className="fw-bold mb-1">{profileData?.full_name || 'Без имени'}</h4>
+                  <p className="text-muted mb-4">{profileData?.phone_number || 'Нет номера'}</p>
+                  
+                  <button onClick={() => setIsEditing(true)} className="btn btn-elf w-100 rounded-pill fw-medium mb-2">
+                    ✏️ Редактировать профиль
+                  </button>
+
+                  <button onClick={handleLogout} className="btn btn-outline-danger w-100 rounded-pill fw-medium mb-2">
+                    Выйти из аккаунта
+                  </button>
+                  
+                  <Link to="/support" className="btn btn-light border w-100 rounded-pill fw-medium shadow-sm">
+                    💬 Служба поддержки
+                  </Link>
+                </>
+              )}
             </div>
           </div>
 
@@ -104,7 +225,7 @@ export default function Profile() {
             </div>
           </div>
 
-          {/* ИСТОРИЯ БОНУСОВ (НОВЫЙ БЛОК) */}
+          {/* ИСТОРИЯ БОНУСОВ (Без изменений) */}
           <div className="card border-0 shadow-sm" style={{ borderRadius: '15px' }}>
             <div className="card-body p-4">
               <h6 className="fw-bold mb-3">История бонусов 🪙</h6>
@@ -114,7 +235,6 @@ export default function Profile() {
               ) : (
                 <div className="list-group list-group-flush">
                   {bonusHistory.map(tx => {
-                    // Если это списание, красим в красный и ставим минус, иначе зеленый и плюс
                     const isSpend = tx.transaction_type === 'Spend';
                     const colorClass = isSpend ? 'text-danger' : 'text-success';
                     const sign = isSpend ? '-' : '+';

@@ -15,7 +15,7 @@ export default function Menu() {
   const navigate = useNavigate();
   const { addToCart } = useContext(CartContext);
   
-  const MEDIA_BASE = 'http://127.0.0.1:8000';
+  const MEDIA_BASE = import.meta.env.VITE_BASE_URL;
 
   const handleAddToCart = (product) => {
     const token = localStorage.getItem('token');

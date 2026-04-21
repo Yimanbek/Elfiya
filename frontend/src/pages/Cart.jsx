@@ -6,12 +6,11 @@ import api from '../api/axios';
 export default function Cart() {
   const { cart, addToCart, removeFromCart, clearCart, totalPrice } = useContext(CartContext);
   const navigate = useNavigate();
-
   const [isPaying, setIsPaying] = useState(false);
   const [address, setAddress] = useState(''); // Стейт для адреса
   const [useBonuses, setUseBonuses] = useState(false); // Стейт для галочки
   const [walletBalance, setWalletBalance] = useState(0); // Стейт для баланса
-
+  const BASE_URL = import.meta.env.VITE_BASE_URL;
   // Подтягиваем баланс при открытии корзины
   useEffect(() => {
     api.get('profile/')
@@ -74,7 +73,7 @@ export default function Cart() {
                 <div key={item.id} className="row align-items-center mb-4 border-bottom pb-3">
                   <div className="col-3 col-md-2">
                     <img 
-                      src={item.image ? (item.image.startsWith('http') ? item.image : `http://127.0.0.1:8000${item.image}`) : 'https://via.placeholder.com/150'} 
+                      src={item.image ? (item.image.startsWith('http') ? item.image : `${BASE_URL}${item.image}`) : 'https://via.placeholder.com/150'} 
                       alt={item.name} 
                       className="img-fluid rounded-3 shadow-sm" 
                       style={{ objectFit: 'cover', height: '80px', width: '100%' }}

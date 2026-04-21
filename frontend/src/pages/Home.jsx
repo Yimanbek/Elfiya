@@ -4,6 +4,7 @@ import api from '../api/axios';
 import { CartContext } from '../context/CartContext';
 
 export default function Home() {
+  const MEDIA_BASE = import.meta.env.VITE_BASE_URL;
   const [news, setNews] = useState([]);
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -18,7 +19,6 @@ export default function Home() {
 
   const { addToCart } = useContext(CartContext);
   const navigate = useNavigate();
-  const MEDIA_BASE = 'http://127.0.0.1:8000';
 
   // 1. ЗАГРУЗКА ДАННЫХ
   useEffect(() => {

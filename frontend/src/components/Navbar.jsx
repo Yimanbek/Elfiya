@@ -81,7 +81,7 @@ function Navbar() {
                   <li>
                     <a 
                       className="dropdown-item fw-bold py-2 text-danger" 
-                      href="http://localhost:8000/admin/" 
+                      href={`${process.env.REACT_APP_API_URL}/admin/`}
                       target="_blank" 
                       rel="noopener noreferrer"
                     >

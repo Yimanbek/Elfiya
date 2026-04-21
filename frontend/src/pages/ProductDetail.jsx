@@ -26,7 +26,7 @@ export default function ProductDetail() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  const MEDIA_BASE = 'http://127.0.0.1:8000';
+  const MEDIA_BASE = import.meta.env.VITE_BASE_URL;
 
   useEffect(() => {
     const fetchProduct = async () => {
