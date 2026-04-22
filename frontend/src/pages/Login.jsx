@@ -50,7 +50,7 @@ export default function Login() {
             <input 
               type="email" 
               className="form-control rounded-pill px-4 py-2" 
-              placeholder="hello@elfiya.kg"
+              placeholder="hello@efa_cafe.kg"
               value={email} 
               onChange={(e) => setEmail(e.target.value)} 
               required 

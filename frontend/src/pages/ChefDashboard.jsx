@@ -1,13 +1,15 @@
 import { useState, useEffect } from 'react';
 import api from '../api/axios';
+import { useAdmin } from '../hooks/useAdmin';
 
 export default function ChefDashboard() {
   const [activeOrders, setActiveOrders] = useState([]);
   const [loading, setLoading] = useState(true);
+  const isLoading = useAdmin(); 
 
   const fetchOrders = async () => {
     try {
-      const res = await api.get('orders/');
+      const res = await api.get('orders-chdash/');
       // Оставляем только НЕвыполненные заказы
       setActiveOrders(res.data.filter(order => !order.is_completed));
       setLoading(false);
@@ -23,6 +25,16 @@ export default function ChefDashboard() {
     const interval = setInterval(fetchOrders, 10000);
     return () => clearInterval(interval);
   }, []);
+
+  if (isLoading) {
+    return (
+      <div className="d-flex justify-content-center align-items-center vh-100">
+        <div className="spinner-border text-danger" role="status">
+          <span className="visually-hidden">Проверка доступа...</span>
+        </div>
+      </div>
+    );
+  }
 
   const handleComplete = async (orderId) => {
     if (!window.confirm(`Выдать заказ #${orderId}?`)) return;

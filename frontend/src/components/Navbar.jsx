@@ -45,7 +45,7 @@ function Navbar() {
       <div className="container-fluid px-4 px-lg-5">
         
         <Link className="navbar-brand brand-font text-primary-elf fs-2 fw-bold" to="/">
-          ✨ Elfiya
+          ✨ Efa Cafe
         </Link>
         
         <button className="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -81,7 +81,7 @@ function Navbar() {
                   <li>
                     <a 
                       className="dropdown-item fw-bold py-2 text-danger" 
-                      href={`${process.env.REACT_APP_API_URL}/admin/`}
+                      href={`${import.meta.env.VITE_BASE_URL}/admin/`}
                       target="_blank" 
                       rel="noopener noreferrer"
                     >

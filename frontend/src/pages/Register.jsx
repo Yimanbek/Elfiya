@@ -72,7 +72,7 @@ export default function Register() {
             <label className="form-label text-muted small fw-bold">Email (для входа) *</label>
             <input 
               type="email" name="email" className="form-control form-control-lg bg-light border-0 rounded-pill fs-6" 
-              placeholder="hello@elfiya.kg" onChange={handleChange} required
+              placeholder="hello@efa_cafe.kg" onChange={handleChange} required
             />
           </div>
 

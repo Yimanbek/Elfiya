@@ -1,12 +1,14 @@
 import { useState } from 'react';
 import api from '../api/axios';
 import * as XLSX from 'xlsx'; // ИМПОРТИРУЕМ БИБЛИОТЕКУ EXCEL
+import { useAdmin } from '../hooks/useAdmin';
 
 export default function Reports() {
   const [selectedReport, setSelectedReport] = useState(null);
   const [dates, setDates] = useState({ start: '', end: '' });
   const [reportData, setReportData] = useState(null);
   const [loading, setLoading] = useState(false);
+  const isLoading = useAdmin(); 
 
   const reportTypes = [
     { id: 'revenue', title: 'Доходы и выручка', desc: 'Полный финансовый отчет по кассе', icon: '💰', needsDates: true },
@@ -50,15 +52,25 @@ export default function Reports() {
     
     // 4. Генерируем красивое имя файла с датой
     const today = new Date().toLocaleDateString('ru-RU').replace(/\./g, '-');
-    const fileName = `Elfiya_${selectedReport.id}_${today}.xlsx`;
+    const fileName = `Efa_cafe_${selectedReport.id}_${today}.xlsx`;
 
     // 5. Сохраняем файл на компьютер юзера
     XLSX.writeFile(workbook, fileName);
   };
 
+  if (isLoading) {
+    return (
+      <div className="d-flex justify-content-center align-items-center vh-100">
+        <div className="spinner-border text-danger" role="status">
+          <span className="visually-hidden">Проверка доступа...</span>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="container mt-5 mb-5 pb-5">
-      <h2 className="brand-font text-dark mb-5 text-center">📊 Аналитический центр Elfiya</h2>
+      <h2 className="brand-font text-dark mb-5 text-center">📊 Аналитический центр Efa</h2>
 
       {/* СЕТКА ИКОНОК-ОТЧЕТОВ */}
       {!selectedReport && (

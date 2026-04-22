@@ -11,7 +11,7 @@ export default function Footer() {
           {/* 1. Логотип и описание */}
           <div className="col-lg-4 col-md-6">
             <Link className="navbar-brand brand-font text-primary-elf fs-2 text-decoration-none fw-bold" to="/">
-              ✨ Elfiya
+              ✨ Efa Cafe
             </Link>
             <p className="text-muted mt-3 mb-0 pe-lg-5 lh-lg" style={{ fontSize: '0.9rem' }}>
               Больше, чем просто доставка еды в Бишкеке. Готовим с душой, используем лучшие ингредиенты и доставляем магию вкуса прямо к вашей двери.
@@ -74,7 +74,7 @@ export default function Footer() {
         {/* НИЖНЯЯ ЧАСТЬ (Копирайт) */}
         <div className="row align-items-center">
           <div className="col-md-6 text-center text-md-start text-muted small fw-medium">
-            © 2026 Elfiya Cafe. Все права защищены.
+            © 2026 Efa Cafe. Все права защищены.
           </div>
           <div className="col-md-6 text-center text-md-end text-muted small mt-2 mt-md-0 fw-medium">
             Сделано с ❤️ для защиты диплома

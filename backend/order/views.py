@@ -75,3 +75,10 @@ def complete_order(request, pk):
         return Response({"message": "Заказ выдан!"}, status=200)
     except Order.DoesNotExist:
         return Response({"error": "Заказ не найден"}, status=404)
+
+@api_view(['GET'])
+@permission_classes([IsAdminUser])
+def get_orders(request):
+    orders = Order.objects.all()
+    serializer = OrderSerializer(orders, many=True)
+    return Response(serializer.data)
